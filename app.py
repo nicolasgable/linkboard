@@ -42,9 +42,21 @@ def close_db(_exc):
 
 
 def init_db():
-    with app.app_context():
-        get_db().executescript(SCHEMA)
-        get_db().commit()
+    try:
+        with app.app_context():
+            get_db().executescript(SCHEMA)
+            get_db().commit()
+    except sqlite3.OperationalError as exc:
+        d = os.path.dirname(DB_PATH) or "."
+        try:
+            st = os.stat(d)
+            info = f"propriétaire {st.st_uid}:{st.st_gid}, droits {oct(st.st_mode & 0o777)}"
+        except OSError as e:
+            info = f"inaccessible ({e})"
+        raise SystemExit(
+            f"[linkboard] Impossible d'ouvrir la base {DB_PATH} : {exc}\n"
+            f"[linkboard] Processus uid={os.getuid()} gid={os.getgid()} ; dossier {d} : {info}"
+        )
 
 
 def normalize_url(url):

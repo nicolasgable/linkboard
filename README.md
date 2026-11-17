@@ -31,5 +31,5 @@ La base SQLite est stockée dans `./data/links.db` (volume `/data`) : pensez à 
 | Variable | Défaut | Rôle |
 |---|---|---|
 | `DB_PATH` | `/data/links.db` | Emplacement de la base |
-| `SECRET_KEY` | `change-me` | Clé de session Flask (messages flash) |
+| `SECRET_KEY` | `change-me` | Clé de session Flask (messages flash), à mettre dans `.env` |
 | `PUID` / `PGID` | `1000` | Utilisateur qui fait tourner l'appli et possède `/data` |

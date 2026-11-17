@@ -6,10 +6,11 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SECRET_KEY=remplacez-moi-par-une-valeur-aleatoire
+      # Valeurs lues dans le fichier .env (à côté de ce fichier), sinon valeurs par défaut
+      - SECRET_KEY=${SECRET_KEY:-change-me}
       # uid/gid propriétaire des fichiers dans ./data (voir `id` sur l'hôte)
-      - PUID=1000
-      - PGID=1000
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
     volumes:
       - ./data:/data
     restart: unless-stopped

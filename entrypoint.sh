@@ -9,7 +9,8 @@ DATA_DIR="$(dirname "${DB_PATH:-/data/links.db}")"
 
 if [ "$(id -u)" = "0" ]; then
     mkdir -p "$DATA_DIR"
-    chown -R "$PUID:$PGID" "$DATA_DIR"
+    chown -R "$PUID:$PGID" "$DATA_DIR" || echo "[linkboard] ATTENTION : chown de $DATA_DIR impossible" >&2
+    echo "[linkboard] $DATA_DIR attribué à $PUID:$PGID, lancement de l'application"
     exec setpriv --reuid="$PUID" --regid="$PGID" --clear-groups "$@"
 fi
 
