@@ -1,0 +1,12 @@
+services:
+  linkboard:
+    build: .
+    image: linkboard:latest
+    container_name: linkboard
+    ports:
+      - "8080:8080"
+    environment:
+      - SECRET_KEY=remplacez-moi-par-une-valeur-aleatoire
+    volumes:
+      - ./data:/data
+    restart: unless-stopped

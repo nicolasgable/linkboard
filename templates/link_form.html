@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Modifier' if link else 'Nouveau' }} lien{% endblock %}
+{% block content %}
+<div class="panel narrow">
+  <h1>{{ 'Modifier le lien' if link else 'Nouveau lien' }}</h1>
+  <form method="post" class="form">
+    <label>Titre *
+      <input name="title" required value="{{ request.form.title or (link.title if link else '') }}" placeholder="Ex : Grafana">
+    </label>
+    <label>URL *
+      <input name="url" required value="{{ request.form.url or (link.url if link else '') }}" placeholder="https://grafana.mondomaine.fr">
+    </label>
+    <label>Catégorie
+      {% set current = (request.form.category_id|int if request.form.category_id) or (link.category_id if link else preselect) %}
+      <select name="category_id">
+        <option value="">— Sans catégorie —</option>
+        {% for c in categories %}
+          <option value="{{ c.id }}" {{ 'selected' if c.id == current }}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    {% if not categories %}<p class="muted small">Astuce : <a href="{{ url_for('categories') }}">créez d'abord des catégories</a>.</p>{% endif %}
+    <label>Description
+      <textarea name="description" rows="3" placeholder="Optionnel">{{ request.form.description or (link.description if link else '') }}</textarea>
+    </label>
+    <label>Ordre d'affichage
+      <input type="number" name="position" value="{{ request.form.position or (link.position if link else 0) }}">
+    </label>
+    <div class="row">
+      <a class="btn" href="{{ url_for('index') }}">Annuler</a>
+      <button class="btn primary">{{ 'Enregistrer' if link else 'Ajouter' }}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

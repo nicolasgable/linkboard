@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Catégories{% endblock %}
+{% block content %}
+<div class="two-cols">
+  <div class="panel">
+    <h1>{{ 'Modifier la catégorie' if edit else 'Nouvelle catégorie' }}</h1>
+    <form method="post" class="form" action="{{ url_for('categories', cat_id=edit.id) if edit else url_for('categories') }}">
+      <label>Nom *
+        <input name="name" required value="{{ request.form.name or (edit.name if edit else '') }}" placeholder="Ex : Monitoring">
+      </label>
+      <div class="row">
+        <label>Couleur
+          <input type="color" name="color" value="{{ request.form.color or (edit.color if edit else '#4f6bed') }}">
+        </label>
+        <label>Ordre
+          <input type="number" name="position" value="{{ request.form.position or (edit.position if edit else 0) }}">
+        </label>
+      </div>
+      <div class="row">
+        {% if edit %}<a class="btn" href="{{ url_for('categories') }}">Annuler</a>{% endif %}
+        <button class="btn primary">{{ 'Enregistrer' if edit else 'Créer' }}</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h1>Catégories existantes</h1>
+    {% if categories %}
+    <table>
+      <thead><tr><th></th><th>Nom</th><th>Liens</th><th>Ordre</th><th></th></tr></thead>
+      <tbody>
+      {% for c in categories %}
+        <tr>
+          <td><span class="swatch" style="background: {{ c.color }}"></span></td>
+          <td>{{ c.name }}</td>
+          <td>{{ c.link_count }}</td>
+          <td>{{ c.position }}</td>
+          <td class="actions inline">
+            <a href="{{ url_for('categories', cat_id=c.id) }}" title="Modifier">✎</a>
+            <form method="post" action="{{ url_for('category_delete', cat_id=c.id) }}" data-confirm="Supprimer la catégorie « {{ c.name }} » ? Ses liens seront conservés sans catégorie." onsubmit="return confirm(this.dataset.confirm)">
+              <button title="Supprimer">✕</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p class="muted">Aucune catégorie.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

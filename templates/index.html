@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="toolbar">
+  <input type="search" id="search" placeholder="Rechercher un lien… ( / )" autofocus>
+  <span class="muted">{{ total }} lien{{ 's' if total != 1 }} · {{ categories|length }} catégorie{{ 's' if categories|length != 1 }}</span>
+</div>
+
+{% if not categories and not uncategorized %}
+  <div class="empty">
+    <p>Aucun lien pour l'instant.</p>
+    <p><a class="btn" href="{{ url_for('categories') }}">Créer une catégorie</a>
+       <a class="btn primary" href="{{ url_for('link_form') }}">Ajouter un lien</a></p>
+  </div>
+{% endif %}
+
+{% macro section(name, color, links, cat_id=None) %}
+<section class="category" style="--cat: {{ color }}">
+  <h2><span class="dot"></span>{{ name }} <small>{{ links|length }}</small>
+    <a class="add" href="{{ url_for('link_form', category=cat_id) if cat_id else url_for('link_form') }}" title="Ajouter un lien ici">+</a>
+  </h2>
+  <div class="grid">
+    {% for l in links %}
+    <div class="card" data-search="{{ (l.title ~ ' ' ~ l.url ~ ' ' ~ l.description ~ ' ' ~ name)|lower }}">
+      <a class="card-link" href="{{ l.url }}" target="_blank" rel="noopener">
+        <span class="favicon">{{ l.title[:1]|upper }}</span>
+        <div>
+          <strong>{{ l.title }}</strong>
+          <span class="url">{{ l.url }}</span>
+          {% if l.description %}<p>{{ l.description }}</p>{% endif %}
+        </div>
+      </a>
+      <div class="actions">
+        <a href="{{ url_for('link_form', link_id=l.id) }}" title="Modifier">✎</a>
+        <form method="post" action="{{ url_for('link_delete', link_id=l.id) }}" data-confirm="Supprimer « {{ l.title }} » ?" onsubmit="return confirm(this.dataset.confirm)">
+          <button title="Supprimer">✕</button>
+        </form>
+      </div>
+    </div>
+    {% else %}
+    <p class="muted small">Aucun lien dans cette catégorie.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endmacro %}
+
+{% for c in categories %}
+  {{ section(c.name, c.color, grouped[c.id], c.id) }}
+{% endfor %}
+{% if uncategorized %}
+  {{ section('Sans catégorie', '#9aa0a6', uncategorized) }}
+{% endif %}
+
+<script>
+  const input = document.getElementById('search');
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    document.querySelectorAll('.category').forEach(sec => {
+      let visible = 0;
+      sec.querySelectorAll('.card').forEach(card => {
+        const show = !q || card.dataset.search.includes(q);
+        card.hidden = !show;
+        if (show) visible++;
+      });
+      sec.hidden = q && visible === 0;
+    });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === '/' && document.activeElement !== input) { e.preventDefault(); input.focus(); }
+  });
+</script>
+{% endblock %}
