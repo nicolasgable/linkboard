@@ -7,6 +7,9 @@ services:
       - "8080:8080"
     environment:
       - SECRET_KEY=remplacez-moi-par-une-valeur-aleatoire
+      # uid/gid propriétaire des fichiers dans ./data (voir `id` sur l'hôte)
+      - PUID=1000
+      - PGID=1000
     volumes:
       - ./data:/data
     restart: unless-stopped
